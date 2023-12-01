@@ -42,14 +42,16 @@ impl TodoCommand {
                 let output_path_str = o_tag_pos.and_then(|i| args.get(i + 1));
 
                 if let None = o_tag_pos {
-                    return Ok(TodoCommand::New {
-                        list: args
-                            .iter()
-                            .skip(2)
-                            .map(|s| s.clone())
-                            .collect::<Vec<String>>(),
-                        file: None,
-                    });
+                    let list = args
+                        .iter()
+                        .skip(2)
+                        .map(|x| x.clone())
+                        .collect::<Vec<String>>();
+                    return if args[1].as_str().eq("new") {
+                        Ok(TodoCommand::New { list, file: None })
+                    } else {
+                        Ok(TodoCommand::Append { list, file: None })
+                    };
                 }
 
                 if let None = o_tag_pos.and(output_path_str) {
@@ -115,14 +117,17 @@ impl TodoCommand {
                 let output_path_str = o_tag_pos.and_then(|i| args.get(i + 1));
 
                 if let None = o_tag_pos {
-                    return Ok(TodoCommand::New {
-                        list: args
-                            .iter()
-                            .skip(2)
-                            .map(|s| s.clone())
-                            .collect::<Vec<String>>(),
-                        file: None,
-                    });
+                    let list = args
+                        .iter()
+                        .skip(2)
+                        .map(|s| s.parse::<usize>())
+                        .map(|i| i.expect("Cannot parse integer"))
+                        .collect::<Vec<usize>>();
+                    return if args[1].as_str().eq("delete") {
+                        Ok(TodoCommand::Delete { list, file: None })
+                    } else {
+                        Ok(TodoCommand::Done { list, file: None })
+                    };
                 }
 
                 if let None = o_tag_pos.and(output_path_str) {
